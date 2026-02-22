@@ -98,25 +98,21 @@
         function handleTap() {
             if (currentStep > 4) return;
 
-            // زيادة العد
             counts[currentStep]++;
+            
+            // تحديث الواجهة فوراً بما في ذلك نص الزر
             updateUI(currentStep);
 
-            // التحقق فوراً إذا وصل للحد
             if (counts[currentStep] >= limits[currentStep]) {
                 if (currentStep < 4) {
                     currentStep++;
-                    // تفعيل الشكل البصري للشريط التالي
                     document.getElementById(`item${currentStep}`).style.opacity = "1";
-                    // تغيير نص الزر فوراً
+                    
+                    // تأكيد تحديث نص الزر للمرحلة الجديدة
                     const btn = document.getElementById('action-btn');
                     btn.innerText = btnLabels[currentStep];
-                    
-                    if (currentStep === 4) {
-                        btn.classList.add('long-text');
-                    }
+                    if (currentStep === 4) btn.classList.add('long-text');
                 } else {
-                    // المرحلة النهائية (تمام المائة)
                     sendToFirebase();
                     finish();
                 }
@@ -126,9 +122,14 @@
         function updateUI(step) {
             const fill = document.getElementById(`fill${step}`);
             const text = document.getElementById(`count${step}`);
+            const btn = document.getElementById('action-btn');
+            
             const percentage = (counts[step] / limits[step]) * 100;
             fill.style.width = percentage + "%";
             text.innerText = `${counts[step]}/${limits[step]}`;
+            
+            // التأكد من أن نص الزر يطابق المرحلة الحالية دائماً
+            btn.innerText = btnLabels[currentStep];
         }
 
         function sendToFirebase() {
