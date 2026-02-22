@@ -25,7 +25,7 @@
             -webkit-tap-highlight-color: transparent; padding: 15px; display: flex; align-items: center; justify-content: center;
             line-height: 1.3; overflow: hidden; text-align: center;
         }
-        .tasbih-btn.long-text { font-size: 1rem; padding: 10px; }
+        .tasbih-btn.long-text { font-size: 0.95rem; padding: 10px; }
         .tasbih-btn:active { transform: scale(0.92); background: var(--primary-green); color: white; border-color: #2ecc71; }
         .bars-section { order: 2; }
         .tasbih-item { margin-bottom: 12px; text-align: right; }
@@ -51,9 +51,9 @@
         </div>
 
         <div class="bars-section">
-            <div class="tasbih-item"><div class="bar-container"><div class="bar-text"><span>سبحان الله</span><span id="count1">0/33</span></div><div id="fill1" class="bar-fill"></div></div></div>
-            <div class="tasbih-item"><div class="bar-container"><div class="bar-text"><span>الحمد لله</span><span id="count2">0/33</span></div><div id="fill2" class="bar-fill"></div></div></div>
-            <div class="tasbih-item"><div class="bar-container"><div class="bar-text"><span>الله أكبر</span><span id="count3">0/33</span></div><div id="fill3" class="bar-fill"></div></div></div>
+            <div class="tasbih-item" id="item1"><div class="bar-container"><div class="bar-text"><span>سبحان الله</span><span id="count1">0/33</span></div><div id="fill1" class="bar-fill"></div></div></div>
+            <div class="tasbih-item" id="item2" style="opacity: 0.2;"><div class="bar-container"><div class="bar-text"><span>الحمد لله</span><span id="count2">0/33</span></div><div id="fill2" class="bar-fill"></div></div></div>
+            <div class="tasbih-item" id="item3" style="opacity: 0.2;"><div class="bar-container"><div class="bar-text"><span>الله أكبر</span><span id="count3">0/33</span></div><div id="fill3" class="bar-fill"></div></div></div>
             <div class="tasbih-item" id="item4" style="opacity: 0.2;">
                 <div class="bar-container">
                     <div class="bar-text"><span class="small-text-bar">لا إله إلا الله وحده لا شريك له، له الملك وله الحمد، وهو على كل شيء قدير</span><span id="count4">0/1</span></div>
@@ -91,41 +91,44 @@
         let counts = { 1: 0, 2: 0, 3: 0, 4: 0 };
         const limits = { 1: 33, 2: 33, 3: 33, 4: 1 };
         const btnLabels = { 
-            1: "سبحان الله", 
-            2: "الحمد لله", 
-            3: "الله أكبر", 
+            1: "سبحان الله", 2: "الحمد لله", 3: "الله أكبر", 
             4: "لا إله إلا الله وحده لا شريك له، له الملك وله الحمد، وهو على كل شيء قدير" 
         };
 
         function handleTap() {
             if (currentStep > 4) return;
 
+            // زيادة العد
             counts[currentStep]++;
-            updateUI();
+            updateUI(currentStep);
 
+            // التحقق فوراً إذا وصل للحد
             if (counts[currentStep] >= limits[currentStep]) {
                 if (currentStep < 4) {
                     currentStep++;
-                    // تفعيل الشريط التالي
+                    // تفعيل الشكل البصري للشريط التالي
                     document.getElementById(`item${currentStep}`).style.opacity = "1";
-                    // تغيير نص الزر فوراً للجملة التالية
+                    // تغيير نص الزر فوراً
                     const btn = document.getElementById('action-btn');
                     btn.innerText = btnLabels[currentStep];
                     
-                    if (currentStep === 4) btn.classList.add('long-text');
+                    if (currentStep === 4) {
+                        btn.classList.add('long-text');
+                    }
                 } else {
+                    // المرحلة النهائية (تمام المائة)
                     sendToFirebase();
                     finish();
                 }
             }
         }
 
-        function updateUI() {
-            const fill = document.getElementById(`fill${currentStep}`);
-            const text = document.getElementById(`count${currentStep}`);
-            const percentage = (counts[currentStep] / limits[currentStep]) * 100;
+        function updateUI(step) {
+            const fill = document.getElementById(`fill${step}`);
+            const text = document.getElementById(`count${step}`);
+            const percentage = (counts[step] / limits[step]) * 100;
             fill.style.width = percentage + "%";
-            text.innerText = `${counts[currentStep]}/${limits[currentStep]}`;
+            text.innerText = `${counts[step]}/${limits[step]}`;
         }
 
         function sendToFirebase() {
